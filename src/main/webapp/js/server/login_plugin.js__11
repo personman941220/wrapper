@@ -1,0 +1,318 @@
+/*首页加载完成事件，用于判断首页加载是否超时*/
+$(document).ready(function(){
+	new bstClientUtil().remoteCall(JSON.stringify({code:99,data:{}}));
+});
+/*登录函数*/
+var login_plugin = (function(){
+	var _this,bcu,type,method,cur_url,code;
+	var init = function(){
+		_this = login_plugin;
+		bcu = new bstClientUtil();
+	}
+	return {
+		onload:function(){
+			init();
+		},
+		init_auto_login:function(data){/*init登录*/
+			EV_modeAlert('envon');//开启遮罩
+			login_plugin.onload();/*初始化对象*/
+			bcu.addHttpFilter({/*监听登录后主页加载完成*/
+				url:"http://wsbs.gxds.gov.cn:7005/sword?ctrl=LoginCtrlTmp_logout&dlsf=GXGDS",
+				//				callback:'login_plugin.auto_login_img',
+				timeout:40000/*网厅登录特别卡，所以时间设置比较长*/
+			});
+			bcu.setData('login_config_type',data.type);/*记录是跳转网厅(申报已和网厅合并)还是地税*/
+			bcu.setData('login_config_method',data.method);/*记录跳转后执行的方法*/
+			bcu.setData('login_config_data',JSON.stringify(data.data));
+			bcu.setData('login_config_jtxx',JSON.stringify({"account":data.account,"company":data.company,"rqq":data.monthFirst,"rqz":data.monthEnd}));
+			if(data.method==0||data.method==3){/*初始化,快速入口*/
+				bcu.setData('login_config_code',4);/*保存code回调处理代码，根据请求的业务调用不同的回调函数*/
+			}else if(data.method==2){/*扣款*/
+				bcu.setData('login_config_code',2);/*保存code回调处理代码，根据请求的业务调用不同的回调函数*/
+			}else if(data.method==4){
+				bcu.setData('login_config_code',11);/*保存code回调处理代码，根据请求的业务调用不同的回调函数*/
+			}else if(data.method==7){//查询申报信息
+				bcu.setData('login_config_code',13);/*保存code回调处理代码，根据请求的业务调用不同的回调函数*/
+			}else{
+				bcu.setData('login_config_code',6);/*申报*/
+			}
+//			$("input[name='USER_ZH']").val(data.nsrsbh);
+//			$("input[name='USER_MM']").val(data.password);
+			$('#name2').val('12312312')
+			$('#pass2').val('12312312')
+//			if(data.camm!=null&&data.camm!=''){/*正式环境ca选择*/
+//				external.StartAutoSelectCA(data.nsrsbh, data.camm, 10000);
+//			}
+//			cur_url = bstClientUtil.login_main_url;/*网上税务局主页加载监听请求*/
+			cur_url = "/ajax.sword?ctrl=GDSDZBSXTKYhmMmDlCtrl_loadWinIndex";/*网上税务局主页加载监听请求*/
+			bcu.addHttpFilter({/*监听登录后主页加载完成*/
+				url:cur_url,
+				callback:'login_plugin.auto_login_gx',
+				timeout:10000/*网厅登录特别卡，所以时间设置比较长*/
+			});
+			//返回一个状态
+			mainEntry(false);
+			$('#login_a').click();
+		},
+		auto_login_gx :function(res){
+			if(res!=null&&res!=""){
+				//取出token值
+				var token;
+				for(var i=0;i<res.data.length;i++){
+					if(res.data[i]=="gdsinvoktoten"){
+						token = res.data[i].value;
+					}
+				}
+				bcu.addHttpFilter({/*监听登录后主页加载完成*/
+					url:"/WSSBSL/do_index_Index_loadBwParams.action",
+					callback:'login_plugin.auto_login_gx2',
+					timeout:10000/*网厅登录特别卡，所以时间设置比较长*/
+				});
+				window.location.href("http://www.gxgs.gov.cn:8103/WSSBSL/gntz.html?gnid=wssb_index&token=01C14BB6F1FBBE17DED5C0A8D68AA88D");
+				
+			}else{
+				"chaosh"
+			}
+		},
+		auto_login_gx2 : function(res){
+			if(res!=null&&res!=""){
+				bcu.addHttpFilter({/*监听登录后主页加载完成*/
+					url:"/web/server/platform/zqtx/getZqtx.do",
+					callback:'login_plugin.auto_login_gx3',
+					timeout:30000/*网厅登录特别卡，所以时间设置比较长*/
+				});
+				//进入网上税务局
+				gotoBwWssb();
+			}else{
+				chasohi;
+			}
+		},
+		
+		auto_login_gx3 : function(res){
+			if(res!=null&&res!=""){
+				
+				
+				
+			}else{
+				chasohi;
+			}
+		},
+		
+		auto_login_img:function(res){/*判断登录加载完成，分别控制登录国地税 */
+			console.log(res);
+		},
+		auto_login:function(res){/*判断登录加载完成，分别控制登录国地税 */
+			//开启遮罩
+			EV_modeAlert('envon');
+			login_plugin.onload();
+			setTimeout(function(){/*等待页面渲染完成*/
+				if(res!=null&&res!=""){
+					method = bcu.getData('login_config_method');
+					/*type:0国税1地税,2 网上税务局登陆
+					step:1-10非业务，100+业务  1初始化 2 扣款  3 申报信息获取 4 申报
+					tableid:选填
+					msg:中文说明
+					}*/
+					bcu.remoteCall(JSON.stringify({code:'100',data:{"type":'2','step':1,'msg':'网上税务局登录成功！'}}));
+					//快速登陆
+					if(method==3){
+						var method =  function onclick(){
+							taxClientTools.ssoLoginMethod(1);
+						};
+						$($("iframe")[0].contentWindow.document).find("#li_1312091724010001").find('a')[0].setAttribute('onclick',method);
+						var methodNssb = function onclick(){
+							taxClientTools.ssoLoginMethod(2);
+						};
+						$($("iframe")[0].contentWindow.document).find("#li_333333").find('a')[0].setAttribute('onclick',methodNssb);
+						//关闭遮罩
+						setTimeout(function(){
+							EV_closeAlert();
+						},2000);
+					}
+					type = bcu.getData('login_config_type');
+					if(type=="1"){/*登录国税*/
+						_this.login_gs();
+					}else if(type=="0"){/*登录地税*/
+						_this.login_ds();
+					}
+				}
+//				else{/*加载失败*/
+//					login_plugin.login_error("网上税务局登录数据加载异常");
+//				}
+			},2000);
+		},
+		login_gs:function(){
+//			    external.StopWindowShield();
+				method = bcu.getData('login_config_method');
+				var rjbb_dm;
+				if(method==0){/*初始化*/
+					rjbb_dm = '1312091724010001';
+					cur_url = bstClientUtil.gs_tree_url;
+					bcu.addHttpFilter({/*启动监听主页list列表加载*/
+						url:cur_url,
+						callback:'wt_initmain.wt_data',
+						timeout:40000
+					});
+				}else if(method==1){/*申报*/
+					rjbb_dm = '333333';
+					cur_url = bstClientUtil.gs_tree_url;
+					bcu.addHttpFilter({/*启动监听主页list列表加载*/
+						url:cur_url,
+						callback:'gs_main.onload',
+						timeout:40000
+					});
+				}else if(method==2){/*扣款*/
+					rjbb_dm = '1312091724010001';
+					cur_url = bstClientUtil.gs_sbjs_tree_url;
+					bcu.addHttpFilter({/*监听登录后主页加载完成*/
+						url:cur_url,
+						callback:'gs_kkmain.gs_menu',
+						timeout:40000
+					});
+				}else if(method==7){/*国税申报信息*/
+					rjbb_dm = '1312091724010001';
+					cur_url = bstClientUtil.gs_tree_url;
+					bcu.addHttpFilter({/*监听登录后主页加载完成*/
+						url:cur_url,
+						callback:'gds_infoMain.gsInfo',
+						timeout:40000
+					});
+				}
+
+				if(method!=3){/*快速进入*/
+					try{ 
+						baseTools.xhrAjax({/*获取登录url，方法来自网上税务局*/
+							url: bstClientUtil.gs_login_url,
+							params:{
+								RJBB_DM: rjbb_dm,
+								returnJson: true
+							},
+							callback:[function (jsonObj, xhrArgs){
+								switch (parseInt(jsonObj.code)){
+								case 0:
+									window.location.href(jsonObj.data.ssoRedirectURL);/*登录完成跳转*/
+									break;
+								default:
+									_this.login_error("网上税务局登录错误："+jsonObj.msg);/*登录出现异常*/
+								break;
+								}
+							}]
+						});
+					}catch(error){
+						_this.login_error("网上税务局登录错误："+error);/*异常处理*/
+						return;
+					}
+				}
+		},
+		login_ds:function(){
+			method = bcu.getData('login_config_method');
+			cur_url = bstClientUtil.ds_main_url;
+			if(method==0){/*初始化*/
+				bcu.addHttpFilter({/*监听登录后主页加载完成*/
+					url:cur_url,
+					callback:'ds_initmain.clickSearch',
+					timeout:40000
+				});
+			}else if(method==1){/*申报*/
+				bcu.addHttpFilter({/*监听登录后主页加载完成*/
+					url:cur_url,
+					callback:'ds_main.onload',
+					timeout:40000
+				});
+			}else if(method==2){/*扣款*/
+				bcu.addHttpFilter({/*监听登录后主页加载完成*/
+					url:cur_url,
+					callback:'ds_kkmain.ds_menu',
+					timeout:40000
+				});
+			}else if(method==7){//地税申报信息
+				bcu.addHttpFilter({//监听登录后主页加载完成
+					url:cur_url,
+					callback:'gds_infoMain.dsInfo',
+					timeout:40000
+				});
+			}
+			
+			if(method!=3){/*快速进入*/
+				try{ 
+					baseTools.xhrAjax({
+						url: '/checkGt3DsLogin.do',
+						bShow: false,
+						async: false,
+						params: {
+							DJXH: taxClientTools.getCookie('QX_USER').DJXH
+						},
+						callback: [function (jsonObj) {
+							switch (jsonObj.code) {
+								case "0":
+									var r = jsonObj.data;
+									var param = "?htjs_sso_service=" + encodeURIComponent(r.htjs_sso_service) + "&yhuuid=" + encodeURIComponent(r.yhuuid) + "&nsrsbh=" + encodeURIComponent(r.nsrsbh)
+										+ "&dlzhdm=" + encodeURIComponent(r.dlzhdm) + "&sjhm=" + encodeURIComponent(r.sjhm) + "&shxydm=" + encodeURIComponent(r.shxydm) + "&zyhuuid=" + encodeURIComponent(r.zyhuuid) + "&djxh=" + encodeURIComponent(r.djxh)
+										+ "&sfsmrz=" + encodeURIComponent(r.sfsmrz) + "&sfzzh=" + encodeURIComponent(r.sfzzh) + "&sfmrmm=" + encodeURIComponent(r.sfmrmm)
+										+ "&xm=" + encodeURIComponent(r.xm) + "&yhmc=" + encodeURIComponent(r.yhmc);
+									var url = taxClientTools.cnf.zrrDswtURL + param;
+									window.location.href(url);
+									break;
+								default:
+									_this.login_error("网上税务局登录错误："+jsonObj.msg);/*登录出现异常*/
+									return;
+							}
+
+						}]
+					});
+				}catch(error){
+					_this.login_error("网上税务局登录错误："+error);/*登录出现异常*/
+					return;
+				}
+			}
+		},
+		login_error:function(msg){/*对接前台，处理错误信息*/
+			code = bcu.getData('login_config_code');
+			if(msg.indexOf("登录错误")<0){
+				msg="网上税务局登录错误："+msg;
+			}
+			bcu.remoteCall(JSON.stringify({code:code,data:msg}));
+			if(cur_url!=null&&cur_url!=''){/*如果有监听地址，尝试删除监听*/
+				bcu.removeHttpFilter(cur_url);
+			}
+		}
+	};
+}());
+/*重写页面alert，处理错误信息*/
+function alert(msg){
+	if(msg!=null&&msg!=''&&msg.indexOf('请及时更新')>=0){/*ca更新，点掉继续执行，不报错*/
+		return;
+	}
+	login_plugin.login_error(msg);
+}
+
+/*
+ 测试环境测试代码
+ webSocketTool.init()
+ webSocketTool.socket.websocket.send(JSON.stringify({cmd : 1,action : 2,target : 1,url:'http://jcpt.ha-n-tax.gov.cn/web/ythclient/wsbs.html'}))
+ webSocketTool.socket.websocket.send(JSON.stringify({cmd : 2,target : 1,method : 'login_plugin.init_auto_login',data : {type:0,method:0,nsrsbh : '914101023971277115',password : 'q1111111',camm : '111111'}}));
+
+ var html = [];
+ html[html.length] = "<FORM id='form_plugin' method='post' action=''>";
+ html[html.length] = "<INPUT id='caNsrsbh' type='hidden' name='caNsrsbh' value='"+taxClientTools.getCookie("caNsrsbh")+"'/>";
+ html[html.length] = "<INPUT id='shxydm' type='hidden' name='shxydm' value='"+taxClientTools.getCookie("QX_USER")["SHXYDM"]+"'/>";
+ html[html.length] = "<INPUT id='ssdabh' type='hidden' name='ssdabh' value='"+taxClientTools.getCookie("QX_USER")["SSDABH"]+"'/>";
+ html[html.length] = "<INPUT id='randomData' type='hidden' name='randomData' value='"+taxClientTools.getCookie("randomData")+"'/>";
+ html[html.length] = "<INPUT id='cert_hnOrhnxa' type='hidden' name='cert_hnOrhnxa' value='"+taxClientTools.getCookie("cert_hnOrhnxa")+"'/>";
+ html[html.length] = "<INPUT id='signData' type='hidden' name='signData' value='"+taxClientTools.getCookie("signData")+"'/>";
+ html[html.length] = "<INPUT id='signcert' type='hidden' name='signcert' value='"+taxClientTools.getCookie("signcert")+"'/>";
+ html[html.length] = "</FORM>";
+ $('div:eq(2)').append(html.join(''));
+ var form_plugin = $("#form_plugin")[0];
+ 跳转地税请求地址，来自网上税务局本身js
+ form_plugin.action = taxClientTools.cnf.dswtURL;
+ cur_url = bstClientUtil.ds_main_url;
+ bcu.addHttpFilter({监听登录后主页加载完成
+ url:cur_url,
+ callback:method,
+ timeout:15000
+ });
+ $(form_plugin).submit();
+*
+*
+*/

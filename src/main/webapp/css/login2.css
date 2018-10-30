@@ -1,0 +1,470 @@
+html {
+	
+}
+
+body {
+	margin: 0;
+	background: #fff;
+}
+
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+ul li {
+	list-style-type: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #f00;
+}
+
+input, button {
+	font-family: Arial, "微软雅黑";
+}
+
+.cl {
+	clear: both;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+	outline: none;
+}
+
+input::-ms-clear {
+	display: none;
+}
+
+._login {
+	margin: 0 auto;
+	width: 370px;
+	border: 2px solid #eee;
+	border-bottom: none;
+	position: relative;
+}
+
+._header {
+	height: 50px;
+	border-bottom: 1px solid #e2e2e2;
+	position: relative;
+}
+
+._header .switch {
+	height: 45px;
+	position: absolute;
+	left: 60px;
+	bottom: 0;
+	font-size: 16px;
+}
+
+._header .switch #switch_qlogin {
+	margin-right: 85px;
+}
+
+._header .switch .switch_btn {
+	color: #999;
+	display: inline-block;
+	height: 45px;
+	line-height: 45px;
+	outline: none;
+	*hide-focus: expression(this.hideFocus = true);
+}
+
+._header .switch .switch_btn_focus {
+	color: #333;
+	display: inline-block;
+	height: 45px;
+	line-height: 45px;
+	outline: none;
+	*hide-focus: expression(this.hideFocus = true);
+}
+
+._header .switch .switch_btn:hover {
+	color: #333;
+	text-decoration: none;
+}
+
+._header .switch .switch_btn_focus:hover {
+	text-decoration: none;
+}
+
+#switch_bottom {
+	position: absolute;
+	bottom: -1px;
+	_bottom: -2px;
+	border-bottom: 2px solid #848484;
+}
+
+form#login_form {
+	margin: 0 auto;
+}
+
+.web_login {
+	width: 370px;
+	position: relative;
+	margin: 0 auto;
+}
+
+#web_login {
+	_left: 60px;
+	*left: 0;
+}
+
+.web_login .login_form {
+	width: 272px;
+	margin: 0 auto;
+	margin-left: 50px;
+}
+
+.web_login .input-tips {
+	float: left;
+	margin-top: 10px;
+	width: 50px;
+	height: 42px;
+	font-size: 16px;
+	line-height: 42px;
+}
+
+.web_login .input-tips2 {
+	float: left;
+	text-align: right;
+	padding-right: 10px;
+	width: 75px;
+	height: 30px;
+	font-size: 16px;
+	margin-top: 10px;
+	clear: both;
+	line-height: 30px;
+}
+
+.input-tips2.verification {
+	width: 80px;
+	border: 1px solid #ccc;
+	margin: 6px 10px 0 90px;
+	height: 34px;
+	line-height: 34px;
+	cursor: hand;
+	font-size: 12px;
+	text-align: center;
+	background: #ccc;
+}
+
+.web_login .inputOuter {
+	width: 200px;
+	height: 42px;
+	margin-top: 10px;
+	float: left;
+}
+
+.web_login .inputOuter2 {
+	width: 200px;
+	margin-top: 6px;
+	margin-top: 5px\9;
+	float: left;
+}
+
+.web_login .inputstyle2, .web_login .inputstyle {
+	font-size: 14px;
+}
+
+.web_login .inputstyle {
+	width: 200px;
+	height: 38px;
+	padding-left: 5px;
+	line-height: 30px;
+	line-height: 38px;
+	border: 1px solid #D7D7D7;
+	background: #fff;
+	color: #333;
+	border-radius: 2px;
+	ime-mode: disabled;
+}
+
+.web_login input.inputstyle2:focus, .web_login input.inputstyle:focus {
+	border: 1px solid #198BD4;
+	box-shadow: 0 0 2px #198BD4;
+}
+
+.web_login .inputstyle2 {
+	width: 200px;
+	height: 34px;
+	padding-left: 5px;
+	line-height: 34px;
+	border: 1px solid #D7D7D7;
+	background: #fff;
+	color: #333;
+	border-radius: 2px;
+	ime-mode: disabled;
+}
+
+.web_login .uinArea {
+	height: 55px;
+	position: relative;
+	z-index: 10;
+}
+
+.web_login .pwdArea {
+	height: 55px;
+	margin-bottom: 10px;
+	position: relative;
+	z-index: 3;
+}
+
+.web_qr_login {
+	position: relative;
+}
+
+.cue {
+	height: 40px;
+	line-height: 40px;
+	font-size: 14px;
+	border: 1px #CCCCCC solid;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	text-align: center;
+}
+
+._login {
+	background-color: #ffffff;
+}
+
+/* h1{margin:80px auto 50px auto;text-align:center;color:#fff;margin-left:-25px;font-size:35px;font-weight: bold;text-shadow: 0px 1px 1px #555;}
+h1 sup{
+    font-size: 18px;
+    font-style: normal;
+    position: absolute;
+    margin-left: 10px;} */
+._login {
+	border: 0;
+	padding: 5px 0;
+	background: #fff;
+	margin: 0 auto 20px;
+}
+
+.web_login {
+	padding-bottom: 20px;
+}
+
+.jianyi {
+	color: #fff;
+	text-align: center;
+	margin-top: 25px;
+	color: #B3B8C4;
+}
+
+.reg_form li {
+	height: 55px;
+}
+
+.cue {
+	margin-top: 15px;
+	margin-bottom: 10px;
+	border: 1px solid #eee;
+	border-radius: 3px;
+}
+
+.web_login input.inputstyle2:focus, .web_login input.inputstyle:focus {
+	border: 1px solid #5796f;
+	box-shadow: 0 0 0;
+}
+
+.web_login .reg_form {
+	width: 310px;
+	margin: 0 auto;
+}
+
+.web_login .inputstyle2 {
+	border-radius: 2px;
+	width: 210px;
+}
+
+.web_login .input-tips2 {
+	padding-right: 5px;
+	width: 90px;
+	_width: 75px;
+	_font-size: 12px;
+}
+
+.button_blue {
+	display: block;
+	height: 41px;
+	border-radius: 4px;
+	background: #2795dc;
+	border: none;
+	cursor: pointer;
+	border-bottom: 3px solid #0078b3;
+	*border-bottom: none;
+	color: #fff;
+	font-size: 16px;
+	padding: 0 10px;
+	*width: 140px;
+	text-align: center;
+	outline: none;
+	margin: 0 auto;
+}
+
+input.button_blue:hover {
+	background: #0081c1;
+	border-bottom: 3px solid #006698;
+	*border-bottom: none;
+	color: #fff;
+	text-decoration: none;
+}
+
+a.zcxy {
+	text-decoration: underline;
+	line-height: 58px;
+	margin-left: 15px;
+	color: #959ca8;
+}
+
+.web_login .login_form {
+	margin-top: 30px;
+}
+
+.web_login .uinArea {
+	height: 60px;
+}
+
+.header .switch {
+	left: 70px;
+}
+/* 寮规 */
+.black_overlay {
+	display: none;
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: 0.8;
+	filter: alpha(opacity = 80);
+}
+
+.white_content {
+	display: none;
+	position: fixed;
+	top: 25%;
+	left: 40%;
+	width: 370px;
+	height: auto;
+	background-color: white;
+	z-index: 1002;
+}
+
+.white_content  .wite_X {
+	text-align: right;
+	display: block;
+	font-size: 24px;
+	margin-right: 10px;
+}
+
+/* 楠岃瘉鐮� */
+.codeArea {
+	margin-left: 50px;
+}
+
+#ehong-code-input {
+	width: 42px;
+	letter-spacing: 2px;
+	margin: 0px 8px 0px 0px;
+}
+
+.ehong-idcode-val {
+	position: relative;
+	padding: 1px 4px 1px 4px;
+	top: 0px;
+	*top: -3px;
+	letter-spacing: 4px;
+	display: inline;
+	cursor: pointer;
+	font-size: 24px;
+	font-family: "Courier New", Courier, monospace;
+	text-decoration: none;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.ehong-idcode-val0 {
+	border: solid 1px #A4CDED;
+	background-color: #ECFAFB;
+}
+
+.ehong-idcode-val1 {
+	border: solid 1px #A4CDED;
+	background-color: #FCEFCF;
+}
+
+.ehong-idcode-val2 {
+	border: solid 1px #6C9;
+	background-color: #D0F0DF;
+}
+
+.ehong-idcode-val3 {
+	border: solid 1px #6C9;
+	background-color: #DCDDD8;
+}
+
+.ehong-idcode-val4 {
+	border: solid 1px #6C9;
+	background-color: #F1DEFF;
+}
+
+.ehong-idcode-val5 {
+	border: solid 1px #6C9;
+	background-color: #ACE1F1;
+}
+
+.ehong-code-val-tip {
+	font-size: 12px;
+	color: #1098EC;
+	top: 0px;
+	*top: -3px;
+	position: relative;
+	margin: 0px 0px 0px 4px;
+	cursor: pointer;
+}
+
+input.txtVerification {
+	width: 100px;
+	border: 1px solid #D7D7D7;
+	height: 28px;
+	line-height: 28px;
+	font-size: 14px;
+	color: #333;
+	background: #fff;
+	padding-left: 10px;
+}
+/* 蹇樿瀵嗙爜 */
+.forgetPwd a {
+	font-size: 14px;
+	color: #0081c1;
+	text-align: right;
+	margin-right: 22px;
+	text-decoration: underline;
+	display: block;
+}
+
+.Error_prompt {
+	display: none;
+	position: absolute;
+	left: 50%;
+	margin-left: -267px;
+	margin-top: 442px;
+	width: 534px;
+	height: 56px;
+	line-height: 56px;
+	background-color: #feeba5;
+	color: #ff0f0f;
+	text-align: center;
+	border-radius: 6px;
+}

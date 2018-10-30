@@ -1,0 +1,58 @@
+{
+	// 设置报税机器人内嵌浏览器的内核版本，取值范围：0 默认版本, 8000(0x1F40) IE8兼容模式, 8888(0x22B8) IE8标准模式
+	// 9000(0x2328) IE9兼容模式, 9999 (0x270F) IE9标准模式, 10000 (0x02710) IE10兼容模式, 10001 (0x2711) IE10标准模式
+	// 11000 (0x2AF8) IE11兼容模式, 11001 (0x2AF9) IE11标准模式
+	"ie_ver": 1100,
+
+	// 是否显示报税机器人主窗体
+	"show_main_window": true,
+
+	// 是否显示执行过程中的错误提示窗口
+	"show_error_message": true,
+
+	// 是都启用自动选择CA功能
+	"auto_select_ca": true,
+	
+	// WebSocket服务配置
+	"websocket":{
+		"port":7681,
+		"path": "/ws",
+		"enable":true
+	},
+	
+	//type = 0不跳转,1国税,2地税,3网厅
+	//target 1后台窗口,2后台弹窗
+	//action js注入配置 action=1,2,4,8--1初始化国税，2初始化地税，4申报国税，8申报地税,16登录国税，32登录地税---&action=3则1和2皆加载，action=2则2加载，action=4则4加载，如果action=10则2和8都加载
+	//16 快速登陆
+	"inject_config": [
+		{
+			// 要注入js的url
+			"url": "/SKServer/index.jsp",
+			// 要注入的js文件，本地文件路径或url地址，多个文件以逗号（,）分隔
+			"scripts": [
+				"http://localhost:8082/js/server/util/json2.js?action=63&_v=201805211920",
+				"http://localhost:8082/js/server/util/client_util.js?action=63&_v=201805211920",
+				"http://localhost:8082/js/server/util/main_entry.js?action=63&_v=201805211920",
+				"http://localhost:8082/js/server/util/ev_mode.js?action=63&_v=201805211920",
+				"http://localhost:8082/js/server/login_plugin.js?action=63&_v=201805211920"
+			],
+			// js文件注入完成后要执行的函数
+			"invoke": "",
+			// 注入js的目标iframe窗口序号，当值为-1时，js直接注入到主窗口，若设置的序号无法与实际iframe序号匹配则注入失败
+			"target_iframe":-1
+		}
+		,{
+			// 要注入js的url
+			//https://dzswj.ha-l-tax.gov.cn/webroot/pages/home/index.jsp
+			"url": "/SKServer/sys/index.do",
+			// 要注入的js文件，本地文件路径或url地址，多个文件以逗号（,）分隔
+			"scripts": [
+				"http://localhost:8082/js/server/ttzz.js?action=63&_v=201805211920"
+			],
+			// js文件注入完成后要执行的函数
+			"invoke": "",
+			// 注入js的目标iframe窗口序号，当值为-1时，js直接注入到主窗口，若设置的序号无法与实际iframe序号匹配则注入失败
+			"target_iframe":-1
+		}
+	]
+}

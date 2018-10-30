@@ -1,0 +1,207 @@
+/*首页加载完成事件，用于判断首页加载是否超时*/
+$(document).ready(function() {
+	new bstClientUtil().remoteCall(JSON.stringify({
+		code : 99,
+		data : {}
+	}));
+});
+/* 登录函数 */
+var login_plugin = (function() {
+	var _this, bcu, type, method, cur_url, code;
+	var init = function() {
+		_this = login_plugin;
+		bcu = new bstClientUtil();
+	}
+	return {
+		onload : function() {
+			init();
+		},
+		init_auto_login : function(data) {/* init登录 */
+			// external.StopWindowShield();
+			// debugger;
+			// EV_modeAlert('envon');//开启遮罩
+			debugger;
+			login_plugin.onload();/* 初始化对象 */
+			cur_url = bstClientUtil.login_main_url;/* 网上税务局主页加载监听请求 */
+			bcu.setData('login_config_type', data.type);/* 记录是跳转网厅(申报已和网厅合并)还是地税 */
+			bcu.setData('login_config_method', data.method);/* 记录跳转后执行的方法 */
+			bcu.setData('login_config_data', JSON.stringify(data.data));
+			bcu.setData('login_config_jtxx', JSON.stringify({
+				"account" : data.account,
+				"company" : data.company
+			}));
+			bcu.setData('login_config_shenfen', '66');// 记录返回的需要选择的身份
+			// bcu.setData('login_config_yzm','65');//弹出验证码
+			if (data.method == 0 || data.method == 3) {/* 初始化,快速入口 */
+				bcu.setData('login_config_code', 4);/* 保存code回调处理代码，根据请求的业务调用不同的回调函数 */
+			} else if (data.method == 2) {/* 扣款 */
+				bcu.setData('login_config_code', 2);/* 保存code回调处理代码，根据请求的业务调用不同的回调函数 */
+			} else if (data.method == 4) {
+				bcu.setData('login_config_code', 11);/* 保存code回调处理代码，根据请求的业务调用不同的回调函数 */
+			} else if (data.method == 7) {// 查询申报信息
+				bcu.setData('login_config_code', 13);/* 保存code回调处理代码，根据请求的业务调用不同的回调函数 */
+			} else {
+				bcu.setData('login_config_code', 6);/* 申报 */
+			}
+			$('.layui-layer-btn0')[0].click();// 关闭河北税务局的提示框
+			$("input[name='userName']").val(data.nsrsbh);
+			$("input[name='passWord']").val(data.password);
+			// 返回一个状态
+			// mainEntry(false);
+			if (data.nsrsbh && data.password) {// 有身份证和密码
+				var str = external.GetImgData('yzmImg');// 获取图片,浏览器扩展
+				var imgstr = "<input type='text' id='captchCode' name='captchCode' placeholder='输入计算结果' style='hegiht:40px;width: 120px;float:left;margin-bottom:0;border: 1px solid #ccc;padding: 7px 10px;'><img style='padding-left:50px;hegiht:40px' src='data:image/png;base64," + str + "'/>"
+				// bcu.remoteCall(JSON.stringify({code:'65',data:imgstr}));
+				_this.login_option(imgstr,0);
+			}
+		},
+		login_option : function(param,flag) {//传递封装的HTML至前端
+			debugger;
+			if(flag==1){//选择公司信息
+				bcu.remoteCall(JSON.stringify({
+					code : '66',
+					data : param
+				}));
+			}else if(flag==0){//填写验证码
+				bcu.remoteCall(JSON.stringify({
+					code : '65',
+					data : param
+				}));
+			}
+
+		},
+		login_dl : function(data) {
+			$("input[name='captchCode']").val(data.yam);// 验证码
+			$('#login').click();// 网上税务局提交
+		},
+		login_sf : function(data) {/*选择公司身份信息,此方法开始通过method分业务*/
+			/* 监听动态接口，检测返回数据zzf */
+			// 暂时不用从首页获取数据了
+			/*method:业务标志,0初始化，3快速登陆，2扣款，7申报信息等*/
+			debugger;
+			var method = bcu.getData('login_config_method');
+			if (method == 0) {
+				bcu.addHttpFilter({
+					url : "https://ybs.he-n-tax.gov.cn:8888/bszm-web/api/desktop/todoList/get",// 获取国税税种信息
+					callback : 'hebei_main.data_hebei',
+					timeout : 20000
+				});
+			} else if (method == 7) {
+				bcu.addHttpFilter({
+					url : "https://ybs.he-n-tax.gov.cn:8888/bszm-web/api/desktop/todoList/get",// 获取国税税种信息
+					callback : 'hebei_main.login_hebei1',
+					timeout : 20000
+				});
+			}
+			var liall = $('#choiceCompany li');
+			for (var ik = 0, ij = liall.length; ik < ij; ik++) {
+				if (ik == data.type) {
+					liall[ik].click();
+					break;
+				}
+			}
+			$("#companyEnter").click();
+		},
+		login_error : function(msg) {/* 对接前台，处理错误信息 */
+			// debugger;
+			// msg=$(".layui-layer-content").html();
+			// $(".layui-layer-btn0")[0].click();
+			code = bcu.getData('login_config_code');
+			if (msg.indexOf("登录错误") < 0) {
+				msg = "网上税务局登录错误：" + msg;
+			}
+			bcu.remoteCall(JSON.stringify({
+				code : code,
+				data : msg
+			}));
+			if (cur_url != null && cur_url != '') {/* 如果有监听地址，尝试删除监听 */
+				bcu.removeHttpFilter(cur_url);
+			}
+		}
+	};
+}());
+/* 重写页面alert，处理错误信息 */
+function alert(msg) {
+	if (msg != null && msg != '' && msg.indexOf('请及时更新') >= 0) {/* ca更新，点掉继续执行，不报错 */
+		return;
+	}
+	login_plugin.login_error(msg);
+}
+/* 重写河北网上税务局的layer */
+//layer.alert = function(a, b, d) {
+//	// debugger;
+//	login_plugin.login_error(a);
+//}
+/* 重写河北网上税务局的跳出框 */
+function getSbdw(html) {
+	// 企业
+	var allhtnl = html.split('id=\"choiceCompany\">')[1].split('</ul> <a')[0].split("</li>");
+	var ik, ij = allhtnl.length - 1;
+	// var htmlnew ='<input style="float:left;height:25px;margin-right:10px;"
+	// type="radio" name="xzsf" checked="checked">';
+	var htmlnew = '';
+	// debugger;
+	for (ik = 0; ik < ij; ik++) {
+		if (ik == 0) {
+			htmlnew = '<input style="float:left;height:25px;margin-right:10px;" type="radio"  name="xzsf" checked="checked" value="0">' + allhtnl[ik] + '</li>';
+		} else {
+			htmlnew += '<input style="float:left;height:25px;margin-right:10px;margin-left:-22px;" type="radio" value="' + ik + '" name="xzsf" >' + allhtnl[ik] + '</li>'
+		}
+	}
+	// htmlnew ='<input style="float:left;height:25px;margin-right:10px;"
+	// type="radio" value="1" id="xzsf" name="xzsf" checked>'+
+	// allhtnl[0]+'</li>'+'<input
+	// style="float:left;height:25px;margin-right:10px;margin-left:-22px;"
+	// type="radio" value="2" id="sflsb2" name="sflsb">'+'<li'+allhtnl[1];
+	login_plugin.login_option(htmlnew,1);// 传送前台
+
+	html += '<div class="fl item-list" style="display:none"><div>';
+	var formhtml = '<label style="margin-bottom: 20px;display: block">请输入企业（单位）信息，绑定后即可办理社保费及代扣代缴个税业务。</label></br>' + '<label for="nsrsbh" class="socialLabel">纳税人识别号 <span style="color: red">*</span>：</label><input type="text" id="newnsrsbh" name="nsrsbh"></br>' + '<label for="nsrmc" class="socialLabel">纳税人名称 <span style="color: red">*</span>：</label><input type="text" id="newnsrmc" name="nsrmc"></br>' + '<label for="frxm" class="socialLabel">法人姓名 <span style="color: red">*</span>：</label><input type="text" id="newfrxm" name="frxm">' + '</br><a class="button button-blue" id="socialBind">马上绑定</a>';
+	$.get(contextPath + "/auth/getSbhxx.do", {}, function(res) {
+		if (res.data.length == 0) {
+			html += '<div id="socialForm">' + formhtml + '</div><div style="display: none" id="socialBox"><ul id="choiceSocial"></ul><a class="button button-blue" id="socialEnter">确定进入</a>'
+		} else { // 法人登录显示身份选择
+			html += '<div style="display: none;" id="socialForm">' + formhtml + '</div>'
+			html += '<div id="socialBox"><ul id="choiceSocial"><label style="margin-bottom: 20px;display: block">请选择您要办理的企业（单位），若列表中没有您需要的企业（单位），请点击 <span style="color : #0994dc;cursor: pointer" id="addSocial">去绑定 >></span></label>'
+				var list = res.data;
+			for (var i = 0; i < list.length; i++) {
+				html += '<li class="' + (i == 0 ? 'choiced' : '') + '" djxh="' + list[i].dsDjxh + '">' + list[i].dsNsrmc + '</li>'
+			}
+			html += '</ul><a class="button button-blue" id="socialEnter">确定进入</a>';
+		}
+		html += '</div></div></div></div>'
+			openDialog(html, "请选择办税身份", "600px", true);
+		// login_plugin.login_shenfen(html);
+	});
+
+}
+/*
+ * 测试环境测试代码 webSocketTool.init()
+ * webSocketTool.socket.websocket.send(JSON.stringify({cmd : 1,action : 2,target :
+ * 1,url:'http://jcpt.ha-n-tax.gov.cn/web/ythclient/wsbs.html'}))
+ * webSocketTool.socket.websocket.send(JSON.stringify({cmd : 2,target : 1,method :
+ * 'login_plugin.init_auto_login',data : {type:0,method:0,nsrsbh :
+ * '914101023971277115',password : 'q1111111',camm : '111111'}}));
+ * 
+ * var html = []; html[html.length] = "<FORM id='form_plugin' method='post'
+ * action=''>"; html[html.length] = "<INPUT id='caNsrsbh' type='hidden'
+ * name='caNsrsbh' value='"+taxClientTools.getCookie("caNsrsbh")+"'/>";
+ * html[html.length] = "<INPUT id='shxydm' type='hidden' name='shxydm'
+ * value='"+taxClientTools.getCookie("QX_USER")["SHXYDM"]+"'/>";
+ * html[html.length] = "<INPUT id='ssdabh' type='hidden' name='ssdabh'
+ * value='"+taxClientTools.getCookie("QX_USER")["SSDABH"]+"'/>";
+ * html[html.length] = "<INPUT id='randomData' type='hidden' name='randomData'
+ * value='"+taxClientTools.getCookie("randomData")+"'/>"; html[html.length] = "<INPUT
+ * id='cert_hnOrhnxa' type='hidden' name='cert_hnOrhnxa'
+ * value='"+taxClientTools.getCookie("cert_hnOrhnxa")+"'/>"; html[html.length] = "<INPUT
+ * id='signData' type='hidden' name='signData'
+ * value='"+taxClientTools.getCookie("signData")+"'/>"; html[html.length] = "<INPUT
+ * id='signcert' type='hidden' name='signcert'
+ * value='"+taxClientTools.getCookie("signcert")+"'/>"; html[html.length] = "</FORM>";
+ * $('div:eq(2)').append(html.join('')); var form_plugin = $("#form_plugin")[0];
+ * 跳转地税请求地址，来自网上税务局本身js form_plugin.action = taxClientTools.cnf.dswtURL; cur_url =
+ * bstClientUtil.ds_main_url; bcu.addHttpFilter({监听登录后主页加载完成 url:cur_url,
+ * callback:method, timeout:15000 }); $(form_plugin).submit();
+ * 
+ * 
+ */

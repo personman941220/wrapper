@@ -442,7 +442,7 @@
             $('#skdo').attr('disabled',"true");
 
             $.ajax({
-                url: '${pageContext.request.contextPath }/enter.do', //ajax提交路径
+                url: 'http://111.59.6.238:8090/enter.do', //ajax提交路径
                 cache:false,
                 data: {
                     'khmc' : khmc,

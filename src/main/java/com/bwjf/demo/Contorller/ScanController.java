@@ -133,7 +133,7 @@ public class ScanController {
     public void scan(HttpServletResponse response, HttpServletRequest request, Model model){
         try {
             redirect_uri = java.net.URLEncoder.encode(redirect_uri, "UTF-8");
-            System.out.println(redirect_uri+"----------------");
+            System.out.println(redirect_uri);
         }catch (Exception e){
             e.printStackTrace();
         }

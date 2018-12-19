@@ -616,5 +616,9 @@ public class WxCardUtil {
      * 调用顺序看这个
      * @throws Exception
      */
-
+    public Integer parseDouble2Int(String input){
+        Double target = Double.parseDouble(input)*100;
+        Integer result = Integer.parseInt(target.toString().substring(0,target.toString().indexOf(".")));
+        return  result;
+    }
 }

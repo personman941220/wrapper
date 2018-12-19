@@ -442,7 +442,7 @@
             $('#skdo').attr('disabled',"true");
 
             $.ajax({
-                url: 'http://111.59.6.238:8090/enter.do', //ajax提交路径
+                url: 'http://113.16.167.157:9900/invoice/enter.do', //ajax提交路径
                 cache:false,
                 data: {
                     'khmc' : khmc,
@@ -468,7 +468,7 @@
                 success: function(responseData) {
                     console.log(responseData.data)
                     alert("提交成功");
-                    window.location.href = "/scan5.do";
+                    window.location.href = "/scan5";
                 },
                 error: function(error) {
                     alert("提交失败，请联系工作人员");
@@ -478,8 +478,6 @@
                     $('#skdo').removeAttr("disabled");
                 }
             });
-
-
         });
     });
 

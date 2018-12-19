@@ -1,6 +1,8 @@
 package com.bwjf.demo.Contorller;
 
 
+import com.bwjf.demo.utils.ParserRequestForMap;
+import com.bwjf.demo.utils.StringHelper;
 import com.bwjf.demo.utils.WxCardUtil;
 import com.bwjf.demo.utils.configReaderUtil;
 
@@ -43,7 +45,37 @@ public class ScanController {
     private String redirect_uri = configReaderUtil.configReader("config.properties","redirect_uri"); //HS
     private String secret = configReaderUtil.configReader("config.properties","secret"); //HS
 
+    @RequestMapping(value = "/WxCallback.do" , produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String WeiXinSender(HttpServletRequest request,String callback){
+        Map<String,Object> map= ParserRequestForMap.parserRequest(request);
+        String fpqqlsh = map.get("fpqqlsh") == null?"":map.get("fpqqlsh").toString();
+        String access_token =  map.get("access_token") == null?"":map.get("access_token").toString();
+        String mediaId = map.get("MediaId") == null?"":map.get("MediaId").toString();
+        String cardId = map.get("cardId") == null?"":map.get("cardId").toString();
+        String xmmc = map.get("xmmc") == null?"":map.get("xmmc").toString();
+        try{
+            /*
+             * 插入数据信息整理*/
+            WxCardUtil wxCardUtil = new WxCardUtil();
+            int price = wxCardUtil.parseDouble2Int(StringHelper.null2String(map.get("price") == null?"":map.get("price").toString(),""));
+            String fphm = StringHelper.null2String(map.get("fphm") == null?"":map.get("fphm").toString(),"");
+            String fpdm = StringHelper.null2String(map.get("fpdm") == null?"":map.get("fpdm").toString(),"");
+            int se = wxCardUtil.parseDouble2Int(StringHelper.null2String(map.get("se") == null?"":map.get("se").toString(),""));
+            int je = wxCardUtil.parseDouble2Int(StringHelper.null2String(map.get("je") == null?"":map.get("je").toString(),""));
+            String gmf_mc = StringHelper.null2String(map.get("gmf_mc") == null?"":map.get("gmf_mc").toString(),"");
+            //不含税金额
+            String bhs_je  = wxCardUtil.parseDouble2Int(StringHelper.null2String(map.get("bhs_je") == null?"":map.get("bhs_je").toString(),"")).toString();
+            String jym = map.get("jym").toString();
+            String openid = wxCardUtil.insertCard(access_token, fpqqlsh, price, 1, xmmc, fpdm, fphm,
+                    se, mediaId, je, gmf_mc, bhs_je, jym, cardId);
+            callback = openid;
 
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
 
 
     @RequestMapping("/jump.do")
@@ -229,5 +261,10 @@ public class ScanController {
     	model.addAttribute("orderno", orderno);
     	model.addAttribute("sjm", sjm);
     	return "ahsxcq";
+    }
+    public static Map<Object, Object> jsonToMap(Object jsonObj) {
+        JSONObject jsonObject = JSONObject.fromObject(jsonObj);
+        Map<Object, Object> map = (Map)jsonObject;
+        return map;
     }
 }
